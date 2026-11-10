@@ -1,0 +1,328 @@
+{
+  "name": "Uno",
+  "description": "Farbe oder Zahl bedienen – wer zuerst alle Karten los ist, gewinnt.",
+  "minPlayers": 2,
+  "maxPlayers": 4,
+  "aspect": 0.6667,
+  "back": "back.svg",
+  "cover": "cards/farbwahl.svg",
+  "table": false,
+  "piles": [
+    {
+      "id": "ziehen",
+      "name": "Nachziehstapel",
+      "faceUp": false
+    },
+    {
+      "id": "ablage",
+      "name": "Ablagestapel",
+      "faceUp": true
+    }
+  ],
+  "startPile": "ziehen",
+  "deal": 7,
+  "shouts": [
+    {
+      "text": "UNO!",
+      "color": "#ffd43b"
+    },
+    {
+      "text": "Rot",
+      "color": "#ff6b6b"
+    },
+    {
+      "text": "Gelb",
+      "color": "#ffd43b"
+    },
+    {
+      "text": "Grün",
+      "color": "#69db7c"
+    },
+    {
+      "text": "Blau",
+      "color": "#74c0fc"
+    }
+  ],
+  "rules": [
+    "Zu Beginn bekommt jeder 7 Karten (Menü → Karten austeilen). Die oberste Karte vom Nachziehstapel kommt offen auf den Ablagestapel.",
+    "Reihum legt man eine Karte auf den Ablagestapel, die in Farbe, Zahl oder Symbol passt.",
+    "Wer nicht kann oder will, zieht eine Karte (auf den Nachziehstapel tippen).",
+    "Aussetzen: der nächste Spieler setzt aus. Richtungswechsel: die Spielrichtung dreht sich um. +2: der nächste zieht 2 Karten.",
+    "Farbwahl: darf immer gelegt werden, man wünscht sich eine Farbe (Knopf „Rot/Gelb/Grün/Blau“). Farbwahl +4: zusätzlich zieht der nächste 4 Karten.",
+    "Bei der vorletzten Karte „UNO!“ rufen – sonst 2 Strafkarten.",
+    "Wer zuerst keine Karten mehr hat, drückt „Gewonnen“. Danach: Menü → Neue Runde.",
+    "Ist der Nachziehstapel leer: beim Ablagestapel auf ⋯ tippen → „Alle außer der obersten unter Nachziehstapel mischen“."
+  ],
+  "cards": [
+    {
+      "name": "Rot 0",
+      "image": "cards/rot-0.svg",
+      "count": 1
+    },
+    {
+      "name": "Rot 1",
+      "image": "cards/rot-1.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot 2",
+      "image": "cards/rot-2.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot 3",
+      "image": "cards/rot-3.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot 4",
+      "image": "cards/rot-4.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot 5",
+      "image": "cards/rot-5.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot 6",
+      "image": "cards/rot-6.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot 7",
+      "image": "cards/rot-7.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot 8",
+      "image": "cards/rot-8.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot 9",
+      "image": "cards/rot-9.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot Aussetzen",
+      "image": "cards/rot-aussetzen.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot Richtungswechsel",
+      "image": "cards/rot-richtung.svg",
+      "count": 2
+    },
+    {
+      "name": "Rot +2",
+      "image": "cards/rot-plus2.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb 0",
+      "image": "cards/gelb-0.svg",
+      "count": 1
+    },
+    {
+      "name": "Gelb 1",
+      "image": "cards/gelb-1.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb 2",
+      "image": "cards/gelb-2.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb 3",
+      "image": "cards/gelb-3.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb 4",
+      "image": "cards/gelb-4.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb 5",
+      "image": "cards/gelb-5.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb 6",
+      "image": "cards/gelb-6.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb 7",
+      "image": "cards/gelb-7.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb 8",
+      "image": "cards/gelb-8.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb 9",
+      "image": "cards/gelb-9.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb Aussetzen",
+      "image": "cards/gelb-aussetzen.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb Richtungswechsel",
+      "image": "cards/gelb-richtung.svg",
+      "count": 2
+    },
+    {
+      "name": "Gelb +2",
+      "image": "cards/gelb-plus2.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün 0",
+      "image": "cards/gruen-0.svg",
+      "count": 1
+    },
+    {
+      "name": "Grün 1",
+      "image": "cards/gruen-1.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün 2",
+      "image": "cards/gruen-2.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün 3",
+      "image": "cards/gruen-3.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün 4",
+      "image": "cards/gruen-4.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün 5",
+      "image": "cards/gruen-5.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün 6",
+      "image": "cards/gruen-6.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün 7",
+      "image": "cards/gruen-7.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün 8",
+      "image": "cards/gruen-8.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün 9",
+      "image": "cards/gruen-9.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün Aussetzen",
+      "image": "cards/gruen-aussetzen.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün Richtungswechsel",
+      "image": "cards/gruen-richtung.svg",
+      "count": 2
+    },
+    {
+      "name": "Grün +2",
+      "image": "cards/gruen-plus2.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau 0",
+      "image": "cards/blau-0.svg",
+      "count": 1
+    },
+    {
+      "name": "Blau 1",
+      "image": "cards/blau-1.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau 2",
+      "image": "cards/blau-2.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau 3",
+      "image": "cards/blau-3.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau 4",
+      "image": "cards/blau-4.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau 5",
+      "image": "cards/blau-5.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau 6",
+      "image": "cards/blau-6.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau 7",
+      "image": "cards/blau-7.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau 8",
+      "image": "cards/blau-8.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau 9",
+      "image": "cards/blau-9.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau Aussetzen",
+      "image": "cards/blau-aussetzen.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau Richtungswechsel",
+      "image": "cards/blau-richtung.svg",
+      "count": 2
+    },
+    {
+      "name": "Blau +2",
+      "image": "cards/blau-plus2.svg",
+      "count": 2
+    },
+    {
+      "name": "Farbwahl",
+      "image": "cards/farbwahl.svg",
+      "count": 4
+    },
+    {
+      "name": "Farbwahl +4",
+      "image": "cards/farbwahl-plus4.svg",
+      "count": 4
+    }
+  ]
+}

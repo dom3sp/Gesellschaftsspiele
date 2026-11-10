@@ -1,0 +1,3 @@
+# Lokale Einstellungen von Claude Code – nicht veröffentlichen
+.claude/
+__pycache__/

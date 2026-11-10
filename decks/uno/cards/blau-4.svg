@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" width="200" height="300">
+<defs><clipPath id="o"><ellipse cx="0" cy="0" rx="70" ry="118"/></clipPath></defs>
+<rect width="200" height="300" rx="18" fill="#fff"/>
+<rect x="9" y="9" width="182" height="282" rx="13" fill="#1F6FEB"/>
+<ellipse cx="100" cy="150" rx="70" ry="118" transform="rotate(28 100 150)" fill="#fff"/><text x="100" y="190" font-size="112" text-anchor="middle" fill="#1F6FEB" stroke="#16161a" stroke-width="6" stroke-linejoin="round" paint-order="stroke" font-style="italic" font-family="'Arial Black','Segoe UI Black','Helvetica Neue',Arial,sans-serif" font-weight="900">4</text><text x="32" y="56.4" font-size="40" text-anchor="middle" fill="#fff" stroke="#16161a" stroke-width="3" stroke-linejoin="round" paint-order="stroke" font-style="italic" font-family="'Arial Black','Segoe UI Black','Helvetica Neue',Arial,sans-serif" font-weight="900">4</text><g transform="rotate(180 100 150)"><text x="32" y="56.4" font-size="40" text-anchor="middle" fill="#fff" stroke="#16161a" stroke-width="3" stroke-linejoin="round" paint-order="stroke" font-style="italic" font-family="'Arial Black','Segoe UI Black','Helvetica Neue',Arial,sans-serif" font-weight="900">4</text></g>
+</svg>
