@@ -1,17 +1,14 @@
-import { createState, addPlayer, applyAction, viewFor, setConnected, rid } from './game.js';
+import * as Cards from './game.js';
+import * as Dice from './dice.js';
 import { HostNet, ClientNet, makeCode, normalizeCode } from './net.js';
+import { q, esc, store, modal, closeModal, listModal, confirmModal, toast, lobbyHtml } from './ui.js';
+import { initDiceUI, render as renderDice, onDiceEvent } from './dice-ui.js';
 
+const { rid } = Cards;
 const $app = document.getElementById('app');
-const q = (sel, root = document) => root.querySelector(sel);
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// Kartenspiele und Würfelspiele haben je eigene Spiellogik mit gleicher Schnittstelle.
+const engine = (deck) => (deck.type === 'dice' ? Dice : Cards);
 
-// ---------- Speicher (darf fehlschlagen, z. B. im privaten Modus) ----------
-function area(kind) { try { return kind === 'session' ? window.sessionStorage : window.localStorage; } catch { return null; } }
-const store = {
-  get(k, kind) { try { const v = area(kind)?.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
-  set(k, v, kind) { try { area(kind)?.setItem(k, JSON.stringify(v)); } catch {} },
-  del(k, kind) { try { area(kind)?.removeItem(k); } catch {} },
-};
 function myToken() {
   let t = store.get('kt-token', 'session');
   if (!t) { t = rid(16); store.set('kt-token', t, 'session'); }
@@ -53,7 +50,7 @@ const ui = {
 function cleanup() {
   if (ui.net) ui.net.destroy();
   store.del('kt-active', 'session');
-  Object.assign(ui, { mode: null, net: null, code: null, deck: null, view: null, me: null, s: null, sel: null, lost: false, logOpen: false });
+  Object.assign(ui, { mode: null, net: null, code: null, deck: null, view: null, me: null, s: null, E: null, sel: null, lost: false, logOpen: false });
   closeModal();
 }
 
@@ -106,12 +103,14 @@ async function showHome(message) {
       <p class="muted">Wähle ein Spiel – du bekommst einen Code für deine Mitspieler.</p>
       <div class="decks">
         ${decks.map((d) => `
-          <button class="deck-tile" data-deck="${esc(d.id)}">
+          <button class="deck-tile${d.type === 'dice' ? ' dice-tile' : ''}" data-deck="${esc(d.id)}">
             <img src="${esc(d.base + (d.cover || d.back))}" alt="">
             <span class="deck-text">
               <b>${esc(d.name)}</b>
               <span>${esc(d.description || '')}</span>
-              <small>${d.minPlayers}–${d.maxPlayers} Spieler · ${d.cards.reduce((n, c) => n + (c.count || 1), 0)} Karten</small>
+              <small>${d.minPlayers}–${d.maxPlayers} Spieler · ${d.type === 'dice'
+                ? Object.values(Dice.VARIANTS).map((v) => v.name).join(' oder ')
+                : `${d.cards.reduce((n, c) => n + (c.count || 1), 0)} Karten`}</small>
             </span>
           </button>`).join('') || '<p class="muted">Keine Decks gefunden.</p>'}
       </div>
@@ -134,7 +133,11 @@ async function showHome(message) {
   q('#join').onclick = doJoin;
   codeInp.addEventListener('keydown', (e) => { if (e.key === 'Enter') doJoin(); });
   $app.querySelectorAll('[data-deck]').forEach((b) => {
-    b.onclick = () => showNameStep({ deck: decks.find((d) => d.id === b.dataset.deck) });
+    b.onclick = () => {
+      const deck = decks.find((d) => d.id === b.dataset.deck);
+      if (deck.type === 'dice') showVariantStep(deck);
+      else showNameStep({ deck });
+    };
   });
   if (canResume) {
     q('#resume').onclick = () => startHost(saved.deckId, null, saved);
@@ -144,12 +147,36 @@ async function showHome(message) {
   if (pre.length === 4 && !message) showNameStep({ code: pre });
 }
 
-// Schritt 2: Namen eingeben (beim Beitreten und beim Erstellen).
-function showNameStep({ code, deck }) {
+// Würfelspiel: erst die Variante wählen, dann den Namen.
+function showVariantStep(deck) {
+  const V = Dice.VARIANTS;
   $app.innerHTML = `
   <main class="home narrow">
     <section class="panel name-step">
-      <p class="step-kicker">${code ? `Raum <b class="code-tag">${esc(code)}</b>` : `Neuer Raum · <b>${esc(deck.name)}</b>`}</p>
+      <p class="step-kicker">Neuer Raum · <b>${esc(deck.name)}</b></p>
+      <h2>Welche Variante?</h2>
+      <div class="variants">
+        ${Object.values(V).map((v) => `
+          <button class="variant-tile" data-variant="${v.id}">
+            <span class="variant-dice">${v.dice.map((s) => `<i class="${s === 10 ? 'd10' : ''}"></i>`).join('')}</span>
+            <b>${esc(deck.name)} ${esc(v.name)}</b>
+            <span>${esc(v.short)}</span>
+          </button>`).join('')}
+      </div>
+      <button id="back" class="btn ghost full">← Zurück</button>
+    </section>
+  </main>`;
+  $app.querySelectorAll('[data-variant]').forEach((b) => { b.onclick = () => showNameStep({ deck, variant: b.dataset.variant }); });
+  q('#back').onclick = () => showHome();
+}
+
+// Schritt 2: Namen eingeben (beim Beitreten und beim Erstellen).
+function showNameStep({ code, deck, variant }) {
+  const title = deck ? esc(deck.name) + (variant ? ` ${esc(Dice.VARIANTS[variant].name)}` : '') : '';
+  $app.innerHTML = `
+  <main class="home narrow">
+    <section class="panel name-step">
+      <p class="step-kicker">${code ? `Raum <b class="code-tag">${esc(code)}</b>` : `Neuer Raum · <b>${title}</b>`}</p>
       <h2>Wie heißt du?</h2>
       <p class="muted">So sehen dich die anderen am Tisch.</p>
       <input id="name" class="input big-input" maxlength="20" placeholder="Dein Name" autocomplete="off" spellcheck="false">
@@ -163,11 +190,15 @@ function showNameStep({ code, deck }) {
     const name = inp.value.trim();
     if (!name) { toast('Bitte gib deinen Namen ein.', 'error'); inp.focus(); return; }
     if (code) startClient(code, name);
-    else startHost(deck.id, name);
+    else startHost(deck.id, name, null, variant);
   };
   q('#go').onclick = go;
   inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
-  q('#back').onclick = () => { history.replaceState(null, '', location.pathname); showHome(); };
+  q('#back').onclick = () => {
+    if (variant) return showVariantStep(deck);
+    history.replaceState(null, '', location.pathname);
+    showHome();
+  };
 }
 
 function showConnecting(text) {
@@ -178,26 +209,27 @@ function showConnecting(text) {
 // ======================================================================
 // Host
 // ======================================================================
-async function startHost(deckId, name, resume) {
+async function startHost(deckId, name, resume, variant) {
   cleanup();
   let deck;
   try { deck = await loadDeck(deckId); } catch (e) { return showHome(e.message); }
+  const E = engine(deck);
   let s, me, code;
   if (resume) {
     s = resume.s; me = resume.me; code = resume.code;
     for (const p of s.players) if (p.id !== me) p.connected = false;
   } else {
-    s = createState(deck, deckId);
-    me = addPlayer(s, deck, name, null, true).id;
+    s = E.createState(deck, deckId, variant);
+    me = E.addPlayer(s, deck, name, null, true).id;
     code = makeCode();
   }
-  Object.assign(ui, { mode: 'host', deck, s, me, code });
+  Object.assign(ui, { mode: 'host', deck, s, me, code, E });
   showConnecting(resume ? `Raum ${code} wird wieder geöffnet …` : 'Raum wird erstellt …');
 
   ui.net = new HostNet(code, {
     ready(c) { ui.code = c; hostSync(); },
     hello(conn, msg) {
-      const p = addPlayer(ui.s, ui.deck, msg.name, String(msg.token || ''));
+      const p = ui.E.addPlayer(ui.s, ui.deck, msg.name, String(msg.token || ''));
       if (!p) {
         conn.send({ type: 'reject', reason: 'Der Raum ist leider voll.' });
         setTimeout(() => { try { conn.close(); } catch {} }, 500);
@@ -208,7 +240,7 @@ async function startHost(deckId, name, resume) {
       hostSync();
     },
     action(pid, a) { hostApply(pid, a); },
-    lost(pid) { setConnected(ui.s, pid, false); hostSync(); },
+    lost(pid) { ui.E.setConnected(ui.s, pid, false); hostSync(); },
     fatal(m) { showHome(m); },
   }, { fixedCode: !!resume });
 }
@@ -216,7 +248,7 @@ async function startHost(deckId, name, resume) {
 function hostApply(pid, a) {
   let res;
   try {
-    res = applyAction(ui.s, ui.deck, pid, a);
+    res = ui.E.applyAction(ui.s, ui.deck, pid, a);
   } catch (e) {
     if (pid === ui.me) toast(e.message, 'error');
     else ui.net.sendTo(pid, { type: 'error', message: e.message });
@@ -237,9 +269,9 @@ function hostApply(pid, a) {
 function hostSync() {
   if (ui.mode !== 'host' || !ui.net) return;
   for (const p of ui.s.players) {
-    if (p.id !== ui.me) ui.net.sendTo(p.id, { type: 'state', view: viewFor(ui.s, ui.deck, p.id) });
+    if (p.id !== ui.me) ui.net.sendTo(p.id, { type: 'state', view: ui.E.viewFor(ui.s, ui.deck, p.id) });
   }
-  ui.view = viewFor(ui.s, ui.deck, ui.me);
+  ui.view = ui.E.viewFor(ui.s, ui.deck, ui.me);
   store.set(HOST_SAVE, { code: ui.code, deckId: ui.s.deckId, me: ui.me, s: ui.s, at: Date.now() });
   renderGame();
 }
@@ -326,6 +358,7 @@ function cardHtml(t, src, id, cls = '', style = '') {
 function renderGame() {
   const v = ui.view, d = ui.deck;
   if (!v || !d) return;
+  if (d.type === 'dice') return renderDice();
   let g = q('#game');
   if (!g) {
     $app.innerHTML = skeleton();
@@ -456,20 +489,7 @@ function renderLobby() {
   const el = q('#lobby');
   const v = ui.view, d = ui.deck;
   if (v.started) { el.innerHTML = ''; return; }
-  const isHost = ui.mode === 'host';
-  el.innerHTML = `<div class="overlay"><div class="dialog lobby">
-    <h2>${esc(d.name)}</h2>
-    <p class="muted">Warte auf Mitspieler (${d.minPlayers}–${d.maxPlayers} Spieler)</p>
-    <p class="label">Raum-Code</p>
-    <div class="bigcode">${esc(ui.code)}</div>
-    <button class="btn" data-act="copy">Einladungslink kopieren</button>
-    <ul class="plist">${v.players.map((p) => `<li style="--pc:${p.color}"><span class="dot"></span>${esc(p.name)}${p.host ? ' <span class="tag">Host</span>' : ''}${p.id === v.me ? ' <span class="muted">(du)</span>' : ''}</li>`).join('')}</ul>
-    ${isHost
-      ? `<button class="btn primary big" data-act="start">Spiel starten</button>
-         ${v.players.length < d.minPlayers ? '<p class="muted small-text">Du kannst auch schon alleine starten – Mitspieler können später noch beitreten.</p>' : ''}`
-      : '<p class="muted">Der Host startet das Spiel gleich.</p>'}
-    <button class="btn ghost" data-act="leave">Raum verlassen</button>
-  </div></div>`;
+  el.innerHTML = lobbyHtml({ title: d.name, view: v, minPlayers: d.minPlayers, maxPlayers: d.maxPlayers, code: ui.code, isHost: ui.mode === 'host' });
 }
 
 // Handkarten überlappen, damit sie in die Breite passen.
@@ -591,48 +611,11 @@ function showRules() {
     <div class="row end"><button class="btn primary" data-close>OK</button></div>`);
 }
 
-// ---------- Modals & Meldungen ----------
-function modal(html, bind) {
-  closeModal();
-  const m = document.createElement('div');
-  m.className = 'overlay modal';
-  m.innerHTML = `<div class="dialog">${html}</div>`;
-  m.addEventListener('click', (e) => { if (e.target === m || e.target.closest('[data-close]')) closeModal(); });
-  document.body.appendChild(m);
-  if (bind) bind(m);
-  return m;
-}
-function closeModal() { document.querySelectorAll('.modal').forEach((m) => m.remove()); }
-
-function listModal(title, items) {
-  modal(`<h2>${esc(title)}</h2><div class="list">${items.map((it, i) => `<button class="btn list-btn ${it[2] || ''}" data-i="${i}">${esc(it[0])}</button>`).join('')}</div>
-    <div class="row end"><button class="btn ghost" data-close>Schließen</button></div>`,
-  (m) => m.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-i]');
-    if (!b) return;
-    closeModal();
-    items[Number(b.dataset.i)][1]();
-  }));
-}
-
-function confirmModal(title, text, ok) {
-  modal(`<h2>${esc(title)}</h2><p class="muted">${esc(text)}</p>
-    <div class="row end"><button class="btn ghost" data-close>Abbrechen</button><button class="btn primary" data-ok>OK</button></div>`,
-  (m) => { q('[data-ok]', m).onclick = () => { closeModal(); ok(); }; });
-}
-
-function toast(text, kind = '') {
-  const box = q('#toasts');
-  const t = document.createElement('div');
-  t.className = `toast ${kind}`;
-  t.textContent = text;
-  box.appendChild(t);
-  setTimeout(() => t.classList.add('out'), 2600);
-  setTimeout(() => t.remove(), 3000);
-}
-
+// ---------- Meldungen ----------
 function showEvent(ev) {
-  if (ev.kind === 'undo') {
+  if (ev.kind === 'roll') {
+    onDiceEvent(ev);
+  } else if (ev.kind === 'undo') {
     toast(`↶ ${ev.name} hat zurückgenommen: ${ev.label}`);
   } else if (ev.kind === 'shout') {
     const b = document.createElement('div');
@@ -842,6 +825,8 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('beforeunload', (e) => {
   if (ui.mode === 'host' && ui.view && ui.s.players.length > 1) { e.preventDefault(); e.returnValue = ''; }
 });
+
+initDiceUI({ ui, act, copyLink, leave, openRename });
 
 // Nach Neuladen automatisch wieder in den Raum (gleicher Platz, gleiche Karten).
 const active = store.get('kt-active', 'session');

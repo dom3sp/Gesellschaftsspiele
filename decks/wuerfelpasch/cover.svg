@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<rect width="200" height="200" rx="24" fill="#123d29"/>
+<g transform="rotate(-14 70 112)"><rect x="22" y="64" width="96" height="96" rx="18" fill="#fffdf7" stroke="#1d2a22" stroke-width="3"/>
+<circle cx="46" cy="88" r="9" fill="#1d2a22"/><circle cx="70" cy="112" r="9" fill="#1d2a22"/><circle cx="94" cy="136" r="9" fill="#1d2a22"/></g>
+<g transform="rotate(12 138 82)"><rect x="96" y="36" width="88" height="88" rx="16" fill="#fffdf7" stroke="#1d2a22" stroke-width="3"/>
+<circle cx="118" cy="58" r="8" fill="#1d2a22"/><circle cx="162" cy="58" r="8" fill="#1d2a22"/><circle cx="118" cy="102" r="8" fill="#1d2a22"/><circle cx="162" cy="102" r="8" fill="#1d2a22"/><circle cx="140" cy="80" r="8" fill="#1d2a22"/></g>
+<g transform="translate(118 118) rotate(8)"><polygon points="34,2 66,26 56,58 34,68 12,58 2,26" fill="#e03131" stroke="#7a1010" stroke-width="3" stroke-linejoin="round"/>
+<text x="34" y="46" font-size="30" font-weight="900" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif">7</text></g>
+</svg>

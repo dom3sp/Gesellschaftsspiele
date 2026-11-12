@@ -1,0 +1,9 @@
+{
+  "type": "dice",
+  "name": "Würfelpasch",
+  "description": "Würfeln, behalten, eintragen – mit Spielblock, der automatisch mitrechnet.",
+  "minPlayers": 1,
+  "maxPlayers": 6,
+  "aspect": 1,
+  "cover": "cover.svg"
+}

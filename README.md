@@ -35,6 +35,18 @@ Dann <http://localhost:8080> öffnen. (Direkt per Doppelklick auf `index.html` g
 Lädt ein Mitspieler die Seite neu, kommt er automatisch auf seinen alten Platz zurück.
 Schließt der Host (Raum-Ersteller) die Seite, kann er den Raum auf der Startseite **fortsetzen**.
 
+## Würfelpasch (Würfelspiel)
+
+Neben den Kartenspielen gibt es ein Würfelspiel mit Spielblock, das die Punkte automatisch ausrechnet
+(`decks/wuerfelpasch/`, Logik in `js/dice.js`, Oberfläche in `js/dice-ui.js`). Beim Erstellen wählt man die Variante:
+
+- **Classic** – 5 Würfel, 13 Felder, Bonus +35 ab 63 oben
+- **7** – 6 Würfel (einer davon 0–9), 3 Tokens pro Spiel für zusätzliche Würfe, 22 Felder, Bonus +45 ab 73 oben
+
+Würfel antippen = behalten. Nach dem Würfeln zeigt der Block in der eigenen Spalte, was jedes Feld bringen würde –
+antippen trägt ein. „↶ Zurück“ nimmt Einträge (und „Neues Spiel“) zurück. Leertaste = würfeln.
+Ist ein Spieler offline, kann der Host für ihn weiterspielen.
+
 ## Neues Spiel (Deck) hinzufügen
 
 1. Ordner anlegen: `decks/<name>/` (z. B. `decks/phase10/`)
