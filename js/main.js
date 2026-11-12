@@ -2,12 +2,16 @@ import * as Cards from './game.js';
 import * as Dice from './dice.js';
 import { HostNet, ClientNet, makeCode, normalizeCode } from './net.js';
 import { q, esc, store, modal, closeModal, listModal, confirmModal, toast, lobbyHtml } from './ui.js';
+import * as Cross from './cross.js';
 import { initDiceUI, render as renderDice, onDiceEvent } from './dice-ui.js';
+import { initCrossUI, render as renderCross, onCrossEvent } from './cross-ui.js';
 
 const { rid } = Cards;
 const $app = document.getElementById('app');
 // Kartenspiele und Würfelspiele haben je eigene Spiellogik mit gleicher Schnittstelle.
-const engine = (deck) => (deck.type === 'dice' ? Dice : Cards);
+const ENGINES = { dice: Dice, cross: Cross };
+const engine = (deck) => ENGINES[deck.type] || Cards;
+const hasVariants = (deck) => !!ENGINES[deck.type];
 
 function myToken() {
   let t = store.get('kt-token', 'session');
@@ -103,13 +107,13 @@ async function showHome(message) {
       <p class="muted">Wähle ein Spiel – du bekommst einen Code für deine Mitspieler.</p>
       <div class="decks">
         ${decks.map((d) => `
-          <button class="deck-tile${d.type === 'dice' ? ' dice-tile' : ''}" data-deck="${esc(d.id)}">
+          <button class="deck-tile${hasVariants(d) ? ' dice-tile' : ''}" data-deck="${esc(d.id)}">
             <img src="${esc(d.base + (d.cover || d.back))}" alt="">
             <span class="deck-text">
               <b>${esc(d.name)}</b>
               <span>${esc(d.description || '')}</span>
-              <small>${d.minPlayers}–${d.maxPlayers} Spieler · ${d.type === 'dice'
-                ? Object.values(Dice.VARIANTS).map((v) => v.name).join(' oder ')
+              <small>${d.minPlayers}–${d.maxPlayers} Spieler · ${hasVariants(d)
+                ? Object.values(engine(d).VARIANTS).map((v) => v.name).join(' oder ')
                 : `${d.cards.reduce((n, c) => n + (c.count || 1), 0)} Karten`}</small>
             </span>
           </button>`).join('') || '<p class="muted">Keine Decks gefunden.</p>'}
@@ -135,7 +139,7 @@ async function showHome(message) {
   $app.querySelectorAll('[data-deck]').forEach((b) => {
     b.onclick = () => {
       const deck = decks.find((d) => d.id === b.dataset.deck);
-      if (deck.type === 'dice') showVariantStep(deck);
+      if (hasVariants(deck)) showVariantStep(deck);
       else showNameStep({ deck });
     };
   });
@@ -149,7 +153,7 @@ async function showHome(message) {
 
 // Würfelspiel: erst die Variante wählen, dann den Namen.
 function showVariantStep(deck) {
-  const V = Dice.VARIANTS;
+  const V = engine(deck).VARIANTS;
   $app.innerHTML = `
   <main class="home narrow">
     <section class="panel name-step">
@@ -171,7 +175,7 @@ function showVariantStep(deck) {
 
 // Schritt 2: Namen eingeben (beim Beitreten und beim Erstellen).
 function showNameStep({ code, deck, variant }) {
-  const title = deck ? esc(deck.name) + (variant ? ` ${esc(Dice.VARIANTS[variant].name)}` : '') : '';
+  const title = deck ? esc(deck.name) + (variant ? ` ${esc(engine(deck).VARIANTS[variant].name)}` : '') : '';
   $app.innerHTML = `
   <main class="home narrow">
     <section class="panel name-step">
@@ -358,6 +362,7 @@ function renderGame() {
   const v = ui.view, d = ui.deck;
   if (!v || !d) return;
   if (d.type === 'dice') return renderDice();
+  if (d.type === 'cross') return renderCross();
   let g = q('#game');
   if (!g) {
     $app.innerHTML = skeleton();
@@ -614,6 +619,7 @@ function showRules() {
 function showEvent(ev) {
   if (ev.kind === 'roll') {
     onDiceEvent(ev);
+    onCrossEvent(ev);
   } else if (ev.kind === 'undo') {
     toast(`↶ ${ev.name} hat zurückgenommen: ${ev.label}`);
   } else if (ev.kind === 'shout') {
@@ -826,6 +832,7 @@ window.addEventListener('beforeunload', (e) => {
 });
 
 initDiceUI({ ui, act, copyLink, leave, openRename });
+initCrossUI({ ui, act, copyLink, leave, openRename });
 
 // Nach Neuladen automatisch wieder in den Raum (gleicher Platz, gleiche Karten).
 const active = store.get('kt-active', 'session');

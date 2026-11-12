@@ -1,0 +1,9 @@
+{
+  "type": "cross",
+  "name": "Kreuz & Quer",
+  "description": "Würfeln und auf dem eigenen Zettel ankreuzen – alle spielen bei jedem Wurf mit.",
+  "minPlayers": 1,
+  "maxPlayers": 5,
+  "aspect": 1,
+  "cover": "cover.svg"
+}

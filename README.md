@@ -47,6 +47,20 @@ Würfel antippen = behalten. Nach dem Würfeln zeigt der Block in der eigenen Sp
 antippen trägt ein. „↶ Zurück“ nimmt Einträge (und „Neues Spiel“) zurück. Leertaste = würfeln.
 Ist ein Spieler offline, kann der Host für ihn weiterspielen.
 
+## Kreuz & Quer (Ankreuz-Würfelspiel)
+
+Würfelspiel mit digitalem Ankreuzzettel (`decks/kreuzundquer/`, Logik in `js/cross.js`, Oberfläche in `js/cross-ui.js`).
+Varianten unterscheiden sich nur im Zettel (`VARIANTS` in `js/cross.js` – jede Reihe = Farbe + Zahlenfolge), die Regeln bleiben gleich.
+
+- Wer dran ist, würfelt (2 weiße + 4 farbige Würfel) und beendet danach den Zug.
+- Jeder kreuzt auf dem eigenen Zettel an (Feld antippen). Passende Felder zum Wurf leuchten auf.
+  Nur von links nach rechts; das letzte Feld erst ab 5 Kreuzen – dann ist die Reihe für alle geschlossen.
+- Punkte pro Reihe, Fehlwürfe (−5) und Endsumme werden automatisch ausgerechnet.
+- „Fehlwurf (−5)“ streicht ein Fehlwurf-Kästchen. Hat der Würfelnde nichts angekreuzt, fragt „Zug beenden“ nach.
+- Ist eine Reihe geschlossen, erscheint unter ihrem Würfel „✕ raus“ (und „↺ zurück“ zum Rückgängigmachen).
+- „↶ Zurück“ nimmt den eigenen letzten Schritt zurück.
+- Ende bei zwei geschlossenen Reihen oder 4 Fehlwürfen eines Spielers.
+
 ## Neues Spiel (Deck) hinzufügen
 
 1. Ordner anlegen: `decks/<name>/` (z. B. `decks/phase10/`)

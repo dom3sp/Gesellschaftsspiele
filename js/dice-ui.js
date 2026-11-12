@@ -19,7 +19,7 @@ export function onDiceEvent(ev) {
 }
 
 const PIPS = { 1: [4], 2: [2, 6], 3: [2, 4, 6], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
-function faceInner(v, sides) {
+export function faceInner(v, sides) {
   if (v === null || v === undefined) return '<span class="die-q">?</span>';
   if (sides === 10) return `<span class="die-num">${v}</span>`;
   const on = new Set(PIPS[v]);
