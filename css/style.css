@@ -710,7 +710,8 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
 /* =====================================================================
    Phasen-Brettspiel (Phasenlauf)
    ===================================================================== */
-.phasen-game { --c-r: #e03131; --c-b: #5c4bd1; --c-y: #f59f00; --c-g: #2f9e44; }
+/* Kartenfarben global, damit sie auch in Dialogen (z. B. „Ablagestapel durchsuchen“) gelten */
+:root { --c-r: #e03131; --c-b: #5c4bd1; --c-y: #f59f00; --c-g: #2f9e44; }
 .phasen-game .xbody { min-height: 0; }
 .pmain { padding: 12px 12px 18px; }
 .pmain > .pgrid { max-width: 1180px; }
