@@ -317,9 +317,21 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
 .variant-tile:active { transform: scale(0.99); }
 .variant-tile b { font-size: 1.25rem; }
 .variant-tile > span:last-child { color: var(--ink-soft); font-size: 0.92rem; }
-.variant-dice { display: flex; gap: 6px; }
-.variant-dice i { width: 22px; height: 22px; border-radius: 5px; background: var(--paper); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35); }
-.variant-dice i.d10 { background: #e03131; clip-path: polygon(50% 0, 100% 38%, 84% 86%, 50% 100%, 16% 86%, 0 38%); }
+.variant-logo { line-height: 1; padding: 4px 0 2px; }
+.variant-logo.v-classic {
+  font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 700;
+  font-size: 2.6rem; letter-spacing: 0.01em; color: var(--paper);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+}
+.variant-logo.v-sieben {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  font-family: "Arial Black", "Segoe UI Black", Impact, system-ui, sans-serif; font-weight: 900;
+  font-size: 3rem; color: #ff6b6b; text-shadow: 0 3px 0 #8f1515;
+}
+.variant-logo.v-sieben small {
+  font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--paper); text-shadow: none;
+}
 
 .dice-game .dg-body {
   flex: 1; min-height: 0; display: grid; gap: 12px; padding: 12px;
