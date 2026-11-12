@@ -52,6 +52,8 @@ function locXY(v, owner, idx, loc) {
   return HOME_XY[seat][Math.max(0, homes.indexOf(idx))];
 }
 const cardOf = (id) => C.ui.view.hand.find((c) => c.id === id);
+// Kartenaufdruck: das Ass zeigt "1 / oder / 11", alle anderen ihr Kurzzeichen
+const face = (t) => (t === 'A' ? '<span class="dc-ace"><b>1</b><i>oder</i><b>11</b></span>' : esc(CARDS[t].short));
 function currentType() {
   const c = selCard && cardOf(selCard);
   if (!c) return null;
@@ -185,7 +187,7 @@ function renderBoard() {
       ${v.roundNo ? `<text y="-9.3" text-anchor="middle" class="dround">Runde ${v.roundNo} · ${v.dealCount} Karten</text>` : ''}
       <g id="ddeck"><rect x="-9.6" y="-6.6" width="8.8" height="12.6" rx="1.2" class="dback"/><rect x="-8.6" y="-5.6" width="6.8" height="10.6" rx="0.8" class="dbackin"/><text x="-5.2" y="1.6" text-anchor="middle" class="dbacktxt">🐾</text></g>
       <text x="-5.2" y="9.6" text-anchor="middle" class="dcount">${v.deckCount}</text>
-      <g id="ddisc">${top ? `<rect x="0.8" y="-6.6" width="8.8" height="12.6" rx="1.2" class="dcard ${CARDS[top].red ? 'red' : 'blue'}"/><text x="5.2" y="1.9" text-anchor="middle" class="dcardtxt">${esc(CARDS[top].short)}</text>`
+      <g id="ddisc">${top ? `<rect x="0.8" y="-6.6" width="8.8" height="12.6" rx="1.2" class="dcard ${CARDS[top].red ? 'red' : 'blue'}"/>${top === 'A' ? '<text x="5.2" y="-1.6" text-anchor="middle" class="dcardtxt ace">1</text><text x="5.2" y="0.9" text-anchor="middle" class="dacesub">oder</text><text x="5.2" y="4.4" text-anchor="middle" class="dcardtxt ace">11</text>' : `<text x="5.2" y="1.9" text-anchor="middle" class="dcardtxt">${esc(CARDS[top].short)}</text>`}`
         : '<rect x="0.8" y="-6.6" width="8.8" height="12.6" rx="1.2" class="dslot"/>'}</g>
       <text x="5.2" y="9.6" text-anchor="middle" class="dcount">${v.discardCount}</text>
     </g>${dealerMark}`;
@@ -300,7 +302,7 @@ function renderPanel() {
     const movers0 = new Set(opts.map((o) => o.owner));
     if (!c) body = '<p class="tray-hint">Wähle unten eine Karte. Danach leuchten die Figuren, die du damit ziehen kannst.</p>';
     else {
-      body = `<div class="dcardinfo"><span class="dmini ${CARDS[c.t].red ? 'red' : 'blue'}">${esc(CARDS[c.t].short)}</span><div><b>${esc(CARDS[c.t].name)}</b><span>${esc(CARDS[c.t].text)}</span></div></div>`;
+      body = `<div class="dcardinfo"><span class="dmini ${CARDS[c.t].red ? 'red' : 'blue'}">${face(c.t)}</span><div><b>${esc(CARDS[c.t].name)}</b><span>${esc(CARDS[c.t].text)}</span></div></div>`;
       if (c.t === 'J') {
         body += `<p class="tray-hint small">Als welche Karte gilt der Joker?</p><div class="djoker">${CARD_ORDER.filter((t) => t !== 'J').map((t) => `<button class="btn small${jokerAs === t ? ' on' : ''}" data-as="${t}">${esc(CARDS[t].short)}</button>`).join('')}</div>`;
       }
@@ -340,7 +342,7 @@ function renderHand() {
   const sorted = [...v.hand].sort((a, b) => CARD_ORDER.indexOf(a.t) - CARD_ORDER.indexOf(b.t));
   el.innerHTML = `<div class="phand-bar"><b>Deine Karten (${v.hand.length})</b></div>
     <div class="phand-row">${sorted.map((c) => `<button class="dcardbtn ${CARDS[c.t].red ? 'red' : 'blue'}${selCard === c.id ? ' sel' : ''}${v.myGive === c.id ? ' given' : ''}" data-card="${c.id}" title="${esc(CARDS[c.t].text)}">
-      <span class="dc-big">${esc(CARDS[c.t].short)}</span><span class="dc-corner">${esc(CARDS[c.t].short)}</span><span class="dc-name">${esc(CARDS[c.t].name)}</span></button>`).join('') || '<span class="muted">Keine Karten</span>'}</div>`;
+      <span class="dc-big">${face(c.t)}</span><span class="dc-corner">${esc(CARDS[c.t].short)}</span><span class="dc-name">${esc(CARDS[c.t].name)}</span></button>`).join('') || '<span class="muted">Keine Karten</span>'}</div>`;
 }
 
 // ---------- Züge ausführen ----------
@@ -467,7 +469,7 @@ function showRules() {
     <div class="row end"><button class="btn primary" data-close>OK</button></div>`);
 }
 function showCards() {
-  modal(`<h2>Die Karten</h2><div class="dcardlist">${CARD_ORDER.map((t) => `<div><span class="dmini ${CARDS[t].red ? 'red' : 'blue'}">${esc(CARDS[t].short)}</span><span>${esc(CARDS[t].text)}</span></div>`).join('')}</div>
+  modal(`<h2>Die Karten</h2><div class="dcardlist">${CARD_ORDER.map((t) => `<div><span class="dmini ${CARDS[t].red ? 'red' : 'blue'}">${face(t)}</span><span>${esc(CARDS[t].text)}</span></div>`).join('')}</div>
     <div class="row end"><button class="btn primary" data-close>OK</button></div>`);
 }
 
@@ -529,7 +531,7 @@ function flyCard(from, to, face, delay, dur = 420) {
   const el = document.createElement('div');
   const red = face && face !== 'back' && CARDS[face]?.red;
   el.className = `dfly ${face === 'back' ? 'back' : red ? 'red' : 'blue'}`;
-  el.innerHTML = face === 'back' ? '<span>🐾</span>' : `<span>${esc(CARDS[face]?.short || '')}</span>`;
+  el.innerHTML = face === 'back' ? '<span>🐾</span>' : face === 'A' ? '<span class="dc-ace"><b>1</b><i>oder</i><b>11</b></span>' : `<span>${esc(CARDS[face]?.short || '')}</span>`;
   el.style.left = `${from.x}px`;
   el.style.top = `${from.y}px`;
   document.body.appendChild(el);
