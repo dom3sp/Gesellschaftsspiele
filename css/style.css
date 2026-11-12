@@ -278,8 +278,15 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
   .board { grid-template-columns: auto 1fr 280px; }
   .game.no-table .board { grid-template-columns: 1fr 280px; }
   .log, .game.log-open .log { display: flex; flex-direction: column; position: static; width: auto; box-shadow: none; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--line); border-radius: 14px; min-height: 0; }
-  .log-head .icon-btn, .topbar [data-act="log"] { display: none; }
   .ticker { visibility: hidden; }
+  /* Verlauf eingeklappt */
+  .game.log-hidden .log { display: none; }
+  .game.log-hidden .ticker { visibility: visible; }
+  .game.log-hidden .board { grid-template-columns: auto 1fr; }
+  .game.no-table.log-hidden .board { grid-template-columns: 1fr; }
+  .dice-game.log-hidden .dg-body { grid-template-columns: minmax(320px, 420px) minmax(0, 1fr) !important; }
+  .cross-game.log-hidden .xbody { grid-template-columns: minmax(0, 1fr) !important; padding-right: 0; }
+  .game:not(.log-hidden) .topbar [data-act="log"] { background: rgba(255, 255, 255, 0.14); }
 }
 
 /* ---------- Handy ---------- */

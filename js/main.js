@@ -1,7 +1,7 @@
 import * as Cards from './game.js';
 import * as Dice from './dice.js';
 import { HostNet, ClientNet, makeCode, normalizeCode } from './net.js';
-import { q, esc, store, modal, closeModal, listModal, confirmModal, toast, lobbyHtml } from './ui.js';
+import { q, esc, store, modal, closeModal, listModal, confirmModal, toast, lobbyHtml, toggleLog, applyLog } from './ui.js';
 import * as Cross from './cross.js';
 import { initDiceUI, render as renderDice, onDiceEvent } from './dice-ui.js';
 import { initCrossUI, render as renderCross, onCrossEvent } from './cross-ui.js';
@@ -371,7 +371,7 @@ function renderGame() {
   }
   g.style.setProperty('--aspect', d.aspect);
   g.classList.toggle('no-table', d.table === false);
-  g.classList.toggle('log-open', ui.logOpen);
+  applyLog(ui);
   q('#codeBtn b').textContent = ui.code || '';
   q('#deckName').textContent = d.name + (v.started ? ` · Runde ${v.round}` : '');
   const undoBtn = q('#undoBtn');
@@ -516,7 +516,7 @@ function onAct(name) {
   switch (name) {
     case 'menu': return openMenu();
     case 'undo': ui.sel = null; return act({ type: 'undo' });
-    case 'log': ui.logOpen = !ui.logOpen; q('#game').classList.toggle('log-open', ui.logOpen); return;
+    case 'log': return toggleLog(ui);
     case 'copy': return copyLink();
     case 'start': return act({ type: 'start' });
     case 'leave': return leave();

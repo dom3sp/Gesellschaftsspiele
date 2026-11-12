@@ -68,3 +68,23 @@ export function lobbyHtml({ title, view, minPlayers, maxPlayers, code, isHost })
     <button class="btn ghost" data-act="leave">Raum verlassen</button>
   </div></div>`;
 }
+
+// ---------- Verlauf ein-/ausklappen ----------
+// Breiter Bildschirm: Verlauf steht als Spalte daneben und lässt sich einklappen (wird gemerkt).
+// Schmaler Bildschirm: Verlauf öffnet sich als Seitenleiste darüber.
+const WIDE = '(min-width: 1100px)';
+export function applyLog(ui) {
+  const g = q('#game');
+  if (!g) return;
+  g.classList.toggle('log-open', !!ui.logOpen);
+  g.classList.toggle('log-hidden', !!store.get('kt-log-hidden'));
+}
+export function toggleLog(ui) {
+  if (window.matchMedia(WIDE).matches) {
+    if (store.get('kt-log-hidden')) store.del('kt-log-hidden');
+    else store.set('kt-log-hidden', true);
+  } else {
+    ui.logOpen = !ui.logOpen;
+  }
+  applyLog(ui);
+}

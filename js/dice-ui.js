@@ -1,5 +1,5 @@
 // Oberfläche für das Würfelspiel: Würfelschale + Spielblock.
-import { q, esc, modal, listModal, confirmModal, lobbyHtml } from './ui.js';
+import { q, esc, modal, listModal, confirmModal, lobbyHtml, toggleLog, applyLog } from './ui.js';
 import { VARIANTS, categories, scoreOf, totals } from './dice.js';
 
 let C = null; // { ui, act, copyLink, leave, openRename }
@@ -85,7 +85,7 @@ export function render() {
     bind(g);
   }
   const { V } = ctxInfo();
-  g.classList.toggle('log-open', !!ui.logOpen);
+  applyLog(ui);
   q('#codeBtn b').textContent = ui.code || '';
   q('#deckName').textContent = `${ui.deck.name} ${V.name} · Spiel ${v.game}`;
   const undoBtn = q('#undoBtn');
@@ -212,7 +212,7 @@ function onAct(name) {
   const { canRoll, canToken } = ctxInfo();
   switch (name) {
     case 'undo': return C.act({ type: 'undo' });
-    case 'log': C.ui.logOpen = !C.ui.logOpen; q('#game').classList.toggle('log-open', C.ui.logOpen); return;
+    case 'log': return toggleLog(C.ui);
     case 'menu': return openMenu();
     case 'copy': return C.copyLink();
     case 'start': return C.act({ type: 'start' });
