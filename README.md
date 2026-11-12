@@ -35,7 +35,7 @@ Dann <http://localhost:8080> öffnen. (Direkt per Doppelklick auf `index.html` g
 Lädt ein Mitspieler die Seite neu, kommt er automatisch auf seinen alten Platz zurück.
 Schließt der Host (Raum-Ersteller) die Seite, kann er den Raum auf der Startseite **fortsetzen**.
 
-## Würfelpasch (Würfelspiel)
+## Extreme (Würfelspiel)
 
 Neben den Kartenspielen gibt es ein Würfelspiel mit Spielblock, das die Punkte automatisch ausrechnet
 (`decks/wuerfelpasch/`, Logik in `js/dice.js`, Oberfläche in `js/dice-ui.js`). Beim Erstellen wählt man die Variante:
