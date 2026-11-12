@@ -1,0 +1,9 @@
+{
+  "type": "klecks",
+  "name": "Klecks!",
+  "description": "Farbe + Zahl würfeln und zusammenhängende Farbfelder auf dem eigenen Blatt ankreuzen.",
+  "minPlayers": 1,
+  "maxPlayers": 6,
+  "aspect": 1,
+  "cover": "cover.svg"
+}

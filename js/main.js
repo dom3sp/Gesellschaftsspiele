@@ -3,13 +3,15 @@ import * as Dice from './dice.js';
 import { HostNet, ClientNet, makeCode, normalizeCode } from './net.js';
 import { q, esc, store, modal, closeModal, listModal, confirmModal, toast, lobbyHtml, toggleLog, applyLog } from './ui.js';
 import * as Cross from './cross.js';
+import * as Klecks from './klecks.js';
 import { initDiceUI, render as renderDice, onDiceEvent } from './dice-ui.js';
 import { initCrossUI, render as renderCross, onCrossEvent } from './cross-ui.js';
+import { initKlecksUI, render as renderKlecks, onKlecksEvent } from './klecks-ui.js';
 
 const { rid } = Cards;
 const $app = document.getElementById('app');
 // Kartenspiele und Würfelspiele haben je eigene Spiellogik mit gleicher Schnittstelle.
-const ENGINES = { dice: Dice, cross: Cross };
+const ENGINES = { dice: Dice, cross: Cross, klecks: Klecks };
 const engine = (deck) => ENGINES[deck.type] || Cards;
 const hasVariants = (deck) => !!ENGINES[deck.type];
 
@@ -363,6 +365,7 @@ function renderGame() {
   if (!v || !d) return;
   if (d.type === 'dice') return renderDice();
   if (d.type === 'cross') return renderCross();
+  if (d.type === 'klecks') return renderKlecks();
   let g = q('#game');
   if (!g) {
     $app.innerHTML = skeleton();
@@ -620,6 +623,7 @@ function showEvent(ev) {
   if (ev.kind === 'roll') {
     onDiceEvent(ev);
     onCrossEvent(ev);
+    onKlecksEvent(ev);
   } else if (ev.kind === 'undo') {
     toast(`↶ ${ev.name} hat zurückgenommen: ${ev.label}`);
   } else if (ev.kind === 'shout') {
@@ -833,6 +837,7 @@ window.addEventListener('beforeunload', (e) => {
 
 initDiceUI({ ui, act, copyLink, leave, openRename });
 initCrossUI({ ui, act, copyLink, leave, openRename });
+initKlecksUI({ ui, act, copyLink, leave, openRename });
 
 // Nach Neuladen automatisch wieder in den Raum (gleicher Platz, gleiche Karten).
 const active = store.get('kt-active', 'session');

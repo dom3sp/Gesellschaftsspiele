@@ -61,6 +61,18 @@ Varianten unterscheiden sich nur im Zettel (`VARIANTS` in `js/cross.js` – jede
 - „↶ Zurück“ nimmt den eigenen letzten Schritt zurück.
 - Ende bei zwei geschlossenen Reihen oder 4 Fehlwürfen eines Spielers.
 
+## Klecks! (Farbblock-Würfelspiel)
+
+Würfelspiel mit eigenem Farbblatt (`decks/klecks/`, Logik in `js/klecks.js`, Oberfläche in `js/klecks-ui.js`).
+Varianten unterscheiden sich nur im Blatt (`VARIANTS` in `js/klecks.js`: 7 Zeilen à 15 Farbbuchstaben g/y/b/p/o + Sternfelder).
+
+- Würfelnder würfelt 3 Farb- + 3 Zahlenwürfel. Jeder wählt 1 Farbe + 1 Zahl, markiert die Felder und tippt „Eintragen“ – oder „Passen“.
+- Die Website prüft die Regeln: Startspalte H, zusammenhängend, gleiche Farbe, genaue Anzahl, an eigenes Kreuz grenzend,
+  Würfelnder wählt zuerst (ab dem 4. Wurf), Joker kosten ein „!“.
+- Volle Spalten / Farben werden automatisch gewertet (zuerst = oberer Wert bzw. 5, später = unterer bzw. 3; gleicher Wurf zählt als zuerst).
+- Ende nach dem Wurf, in dem jemand zwei Farben komplett hat. Allein: 2 + 2 Würfel, 30 Würfe.
+- „↶ Zurück“ nimmt den eigenen letzten Eintrag zurück.
+
 ## Neues Spiel (Deck) hinzufügen
 
 1. Ordner anlegen: `decks/<name>/` (z. B. `decks/phase10/`)
