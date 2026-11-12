@@ -95,7 +95,9 @@ Logik in `js/dog.js`, Oberfläche in `js/dog-ui.js`, 110 Karten.
   (oder Figur antippen, Feld antippen). Schlagen, Verbrennen (7) und Tauschen passieren automatisch.
 - Woanders hingezogen = freier Zug wie am echten Tisch (ohne Regelprüfung, ohne Karte). Danach die Karte über
   „Frei verschieben / Karte ohne Zug ablegen“ abwerfen.
-- 4 oder 6 Spieler: Teams (gegenüber), Kartentausch mit dem Partner. 2, 3 oder 5: jeder für sich, 5 Figuren, Karte nach links.
+- 4 oder 6 Spieler: Teams (gegenüber), 4 Figuren im Zwinger, Kartentausch mit dem Partner.
+  2, 3 oder 5: jeder für sich, 4 Figuren (eine sofort auf dem Start, 3 im Zwinger), Karte nach links.
+- Brettmitte: Ziehstapel (mit Anzahl), Ablage, Runde + Kartenzahl; der Geber ist markiert. Austeilen und Ausspielen sind animiert.
 - Runden mit 6, 5, 4, 3, 2 Karten. Wer nicht ziehen kann, scheidet für die Runde aus.
 - „↶ Zurück“ nimmt den eigenen letzten Schritt zurück (bis der Nächste spielt).
 

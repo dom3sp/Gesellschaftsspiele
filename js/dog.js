@@ -51,7 +51,7 @@ export const RULES = [
   'Eine Figur auf ihrem eigenen Startfeld ist geschützt: Sie kann nicht geschlagen, getauscht oder überholt werden und blockiert alle – auch die eigenen.',
   'Ins Ziel geht es nur vorwärts über das eigene Startfeld (nicht direkt vom Startfeld aus). Im Ziel wird nicht übersprungen, geschlagen oder rückwärts gezogen.',
   'Jede Karte muss vollständig ausgeführt werden – auch die 7.',
-  'Bei 2, 3 und 5 Spielern spielt jeder für sich mit 5 Figuren (eine steht sofort auf dem Startfeld), gibt vor der Runde eine Karte nach links weiter und darf, wenn er nicht ziehen kann, eine Karte abwerfen und eine neue ziehen. Wer zuerst 4 Figuren im Ziel hat, gewinnt.',
+  'Bei 2, 3 und 5 Spielern spielt jeder für sich mit 4 Figuren (eine steht sofort auf dem Startfeld, 3 im Zwinger), gibt vor der Runde eine Karte nach links weiter und darf, wenn er nicht ziehen kann, eine Karte abwerfen und eine neue ziehen. Wer zuerst alle 4 Figuren im Ziel hat, gewinnt.',
 ];
 
 // ---------------------------------------------------------------------------
@@ -68,8 +68,7 @@ export function partnerOf(ctx, pid) {
 export const sameLoc = (a, b) => a && b && a.z === b.z && (a.z === 'h' || (a.z === 't' ? a.i === b.i : a.k === b.k));
 export const allInGoal = (ctx, pid) => {
   const ps = ctx.pieces[pid] || [];
-  const need = ctx.mode === 'team' ? ps.length : 4;
-  return ps.filter((l) => l.z === 'g').length >= need;
+  return ps.length > 0 && ps.every((l) => l.z === 'g');
 };
 export function movers(ctx, pid) {
   if (ctx.mode === 'team' && allInGoal(ctx, pid)) { const p = partnerOf(ctx, pid); return p ? [p] : [pid]; }
@@ -260,7 +259,7 @@ export function setConnected(s, pid, on) {
 function setupPieces(s) {
   for (const p of s.players) {
     s.pieces[p.id] = s.mode === 'team' ? [{ z: 'h' }, { z: 'h' }, { z: 'h' }, { z: 'h' }]
-      : [{ z: 't', i: startOf(p.seat) }, { z: 'h' }, { z: 'h' }, { z: 'h' }, { z: 'h' }];
+      : [{ z: 't', i: startOf(p.seat) }, { z: 'h' }, { z: 'h' }, { z: 'h' }]; // allein: 1 auf dem Start, 3 im Zwinger
   }
 }
 
@@ -270,7 +269,11 @@ function newRound(s) {
   const count = DEAL[(s.roundNo - 1) % DEAL.length];
   for (const p of s.players) { s.discard.push(...s.hands[p.id]); s.hands[p.id] = []; }
   if (s.deck.length < count * n) { s.deck = shuffle([...s.deck, ...s.discard]); s.discard = []; log(s, 'Der Ablagestapel wird neu gemischt'); }
-  for (let k = 0; k < count; k++) for (const p of s.players) s.hands[p.id].push(s.deck.pop());
+  const dealOrder = [];
+  let q = nextPlayer(s, s.players[s.dealer].id);
+  for (let k = 0; k < n; k++) { dealOrder.push(q.id); q = nextPlayer(s, q.id); }
+  for (let k = 0; k < count; k++) for (const id of dealOrder) s.hands[id].push(s.deck.pop());
+  if (s.lastEvents) s.lastEvents.push({ kind: 'deal', count, order: dealOrder, dealer: s.players[s.dealer].id });
   s.exch = {};
   s.out = {};
   s.seven = null;
@@ -401,6 +404,7 @@ function applyInner(s, deck, pid, a) {
     if (i < 0) throw fail('Diese Karte hast du nicht.');
     h.splice(i, 1);
     s.discard.push(cid);
+    s.lastEvents.push({ kind: 'cardPlayed', by: t.id, t: s.cards[cid] });
   };
   const moveEvent = (opt, dragged) => s.lastEvents.push({ kind: 'dmove', owner: opt.owner, idx: opt.idx, path: opt.path, by: pid, dragged: !!dragged });
   const hitText = (hit, burn) => (hit.length ? ` – ${hit.map((h) => P(s, h.owner).name).join(', ')} ${burn ? 'verbrannt' : 'geschlagen'}!` : '');
@@ -417,7 +421,7 @@ function applyInner(s, deck, pid, a) {
       setupPieces(s);
       s.deck = shuffle(Object.keys(s.cards));
       s.dealer = 0;
-      log(s, s.mode === 'team' ? `Spiel beginnt – Teams: ${teamsText(s)}` : 'Spiel beginnt – jeder spielt für sich (5 Figuren)');
+      log(s, s.mode === 'team' ? `Spiel beginnt – Teams: ${teamsText(s)}` : 'Spiel beginnt – jeder spielt für sich (4 Figuren, eine steht schon auf dem Start)');
       newRound(s);
       break;
     }

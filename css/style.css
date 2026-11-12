@@ -912,3 +912,22 @@ body.pdragging .pmeld.fits { border-color: var(--accent); background: rgba(255, 
   .dcardbtn { width: 50px; height: 74px; }
   .dcardbtn .dc-big { font-size: 1.5rem; }
 }
+
+/* Wuff!: Brettmitte + fliegende Karten */
+.dboard .dback { fill: #123a8a; stroke: #fff; stroke-width: 0.5; }
+.dboard .dbackin { fill: none; stroke: rgba(255, 255, 255, 0.45); stroke-width: 0.3; }
+.dboard .dbacktxt { font-size: 4.2px; }
+.dboard .dslot { fill: none; stroke: rgba(255, 255, 255, 0.6); stroke-width: 0.35; stroke-dasharray: 1 0.8; }
+.dboard .dcount { fill: #fff; font-size: 2.6px; font-weight: 800; font-family: system-ui, sans-serif; }
+.dboard .dround { fill: #fff; font-size: 2.5px; font-weight: 800; font-family: system-ui, sans-serif; }
+.dboard .dcardtxt { font-size: 5.6px; }
+.dboard .ddealer rect { fill: #fff; stroke: rgba(0, 0, 0, 0.4); stroke-width: 0.3; }
+.dboard .ddealer text { font-size: 2.3px; font-weight: 900; fill: #1d2a22; font-family: system-ui, sans-serif; }
+.dfly {
+  position: fixed; z-index: 400; width: 34px; height: 48px; margin: -24px 0 0 -17px; border-radius: 6px; border: 2px solid #fff;
+  display: grid; place-items: center; color: #fff; font-weight: 900; font-family: system-ui, sans-serif; pointer-events: none;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+.dfly.back { background: #123a8a; font-size: 1rem; }
+.dfly.blue { background: #1c5fd1; font-size: 1.1rem; }
+.dfly.red { background: #d9342b; font-size: 1.1rem; }

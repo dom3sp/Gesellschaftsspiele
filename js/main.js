@@ -627,13 +627,13 @@ function showRules() {
 
 // ---------- Meldungen ----------
 function showEvent(ev) {
-  if (ev.kind === 'roll') {
-    onDiceEvent(ev);
-    onCrossEvent(ev);
-    onKlecksEvent(ev);
-    onPhasenEvent(ev);
-    onDogEvent(ev);
-  } else if (ev.kind === 'undo') {
+  // Jedes Spiel bekommt alle Ereignisse (Würfeln, Laufen, Austeilen …) und sucht sich seine heraus.
+  onDiceEvent(ev);
+  onCrossEvent(ev);
+  onKlecksEvent(ev);
+  onPhasenEvent(ev);
+  onDogEvent(ev);
+  if (ev.kind === 'undo') {
     toast(`↶ ${ev.name} hat zurückgenommen: ${ev.label}`);
   } else if (ev.kind === 'shout') {
     const b = document.createElement('div');

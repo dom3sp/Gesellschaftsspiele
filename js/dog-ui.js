@@ -16,6 +16,8 @@ let lastKey = '';
 const walk = { key: null, path: [], i: 0, timer: null };
 
 export function onDogEvent(ev) {
+  if (ev.kind === 'deal') return animateDeal(ev);
+  if (ev.kind === 'cardPlayed') return animatePlayed(ev);
   if (ev.kind !== 'dmove') return;
   const v = C && C.ui.view;
   if (ev.dragged && v && ev.by === v.me) return; // selbst gezogen – schon dort
@@ -173,8 +175,20 @@ function renderBoard() {
   marks.dataset.count = show.length;
   // Ablagestapel in der Mitte
   const top = v.discardTop;
-  q('#dpile').innerHTML = top ? `<g transform="translate(50 50) rotate(-30)"><rect x="-7" y="-10" width="14" height="20" rx="1.6" class="dcard ${CARDS[top].red ? 'red' : 'blue'}"/><text y="3.2" text-anchor="middle" class="dcardtxt">${esc(CARDS[top].short)}</text></g>`
-    : '<g transform="translate(50 50) rotate(-30)"><text y="1.4" text-anchor="middle" class="dpaw">🐾</text></g>';
+  const dealerP = v.players.find((p) => p.id === v.dealer);
+  let dealerMark = '';
+  if (dealerP && v.started) {
+    const [mx, my] = HOME_XY[dealerP.seat][4]; // freier Platz am Ende der Zwingerreihe
+    dealerMark = `<g class="ddealer" transform="translate(${mx.toFixed(2)} ${my.toFixed(2)})"><rect x="-4.2" y="-1.9" width="8.4" height="3.8" rx="1.9"/><text y="1.05" text-anchor="middle">gibt</text></g>`;
+  }
+  q('#dpile').innerHTML = `<g transform="translate(50 50) rotate(-30)">
+      ${v.roundNo ? `<text y="-9.3" text-anchor="middle" class="dround">Runde ${v.roundNo} · ${v.dealCount} Karten</text>` : ''}
+      <g id="ddeck"><rect x="-9.6" y="-6.6" width="8.8" height="12.6" rx="1.2" class="dback"/><rect x="-8.6" y="-5.6" width="6.8" height="10.6" rx="0.8" class="dbackin"/><text x="-5.2" y="1.6" text-anchor="middle" class="dbacktxt">🐾</text></g>
+      <text x="-5.2" y="9.6" text-anchor="middle" class="dcount">${v.deckCount}</text>
+      <g id="ddisc">${top ? `<rect x="0.8" y="-6.6" width="8.8" height="12.6" rx="1.2" class="dcard ${CARDS[top].red ? 'red' : 'blue'}"/><text x="5.2" y="1.9" text-anchor="middle" class="dcardtxt">${esc(CARDS[top].short)}</text>`
+        : '<rect x="0.8" y="-6.6" width="8.8" height="12.6" rx="1.2" class="dslot"/>'}</g>
+      <text x="5.2" y="9.6" text-anchor="middle" class="dcount">${v.discardCount}</text>
+    </g>${dealerMark}`;
   void ctx; void actor;
 }
 
@@ -312,9 +326,9 @@ function renderPlayers() {
     const partner = v.mode === 'team' ? v.players.find((x) => x.id === partnerOf(ctx, p.id)) : null;
     return `<div class="pop${p.id === v.turn ? ' cur' : ''}${p.connected ? '' : ' off'}" style="--pc:${p.color}">
       <span class="pdot"></span><b>${esc(p.name)}${p.id === v.me ? ' (du)' : ''}</b>
-      <span class="pcount">🂠 ${p.count}</span><span class="pphase">🏁 ${inGoal}/${v.mode === 'team' ? 4 : 4}</span>
+      <span class="pcount">🂠 ${p.count}</span><span class="pphase">🏁 ${inGoal}/${(v.pieces[p.id] || []).length || 4}</span>
       ${partner ? `<span class="muted small-text">Team mit ${esc(partner.name)}</span>` : ''}
-      ${p.out ? '<span class="tag">raus diese Runde</span>' : ''}${v.phase === 'exchange' && p.gave ? '<span class="tag">✓ getauscht</span>' : ''}
+      ${p.id === v.dealer && v.started ? '<span class="tag">teilt aus</span>' : ''}${p.out ? '<span class="tag">raus diese Runde</span>' : ''}${v.phase === 'exchange' && p.gave ? '<span class="tag">✓ getauscht</span>' : ''}
       <span class="muted">🏆 ${p.wins}</span></div>`;
   }).join('');
 }
@@ -494,3 +508,55 @@ function bind(g) {
   });
 }
 void movers;
+
+// ---------- Karten fliegen lassen (Austeilen, Ausspielen) ----------
+function boardToScreen(x, y) {
+  const svg = q('.dboard');
+  if (!svg) return null;
+  const m = svg.getScreenCTM();
+  return { x: m.a * x + m.c * y + m.e, y: m.b * x + m.d * y + m.f };
+}
+const centerOf = (el) => { if (!el) return null; const r = el.getBoundingClientRect(); return r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null; };
+function playerSpot(pid) {
+  const v = C.ui.view;
+  if (pid === v.me) return centerOf(q('#dhand .phand-row')) || centerOf(q('#dhand'));
+  const seat = seatOf(v, pid);
+  const [x, y] = HOME_XY[seat][1];
+  return boardToScreen(x, y);
+}
+function flyCard(from, to, face, delay, dur = 420) {
+  if (!from || !to || document.hidden) return;
+  const el = document.createElement('div');
+  const red = face && face !== 'back' && CARDS[face]?.red;
+  el.className = `dfly ${face === 'back' ? 'back' : red ? 'red' : 'blue'}`;
+  el.innerHTML = face === 'back' ? '<span>🐾</span>' : `<span>${esc(CARDS[face]?.short || '')}</span>`;
+  el.style.left = `${from.x}px`;
+  el.style.top = `${from.y}px`;
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = `transform ${dur}ms cubic-bezier(.25,.8,.3,1), opacity 200ms ${dur - 120}ms`;
+    el.style.transform = `translate(${to.x - from.x}px, ${to.y - from.y}px) rotate(${(Math.random() * 30 - 15).toFixed(0)}deg)`;
+    el.style.opacity = '0';
+  }, delay + 20);
+  setTimeout(() => el.remove(), delay + dur + 300);
+}
+function animateDeal(ev) {
+  // Erst nachdem das Brett gezeichnet ist (Zustand kommt direkt nach dem Ereignis)
+  setTimeout(() => {
+    const from = centerOf(q('#ddeck'));
+    let n = 0;
+    for (let k = 0; k < ev.count; k++) for (const pid of ev.order) flyCard(from, playerSpot(pid), 'back', 70 * n++, 380);
+  }, 60);
+}
+function animatePlayed(ev) {
+  const v = C.ui.view;
+  const from = ev.by === v?.me ? (lastPlayedFrom || playerSpot(ev.by)) : playerSpot(ev.by);
+  lastPlayedFrom = null;
+  setTimeout(() => flyCard(from, centerOf(q('#ddisc')), ev.t, 0, 450), 10);
+}
+let lastPlayedFrom = null;
+// Startpunkt merken, wenn ich selbst eine Karte ausspiele
+document.addEventListener('pointerdown', (e) => {
+  const c = e.target.closest && e.target.closest('#dhand [data-card]');
+  if (c) lastPlayedFrom = centerOf(c);
+}, true);
