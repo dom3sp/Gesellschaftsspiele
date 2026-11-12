@@ -86,6 +86,19 @@ Brett mit 32 Aktionsfeldern, Phasenring und 96 Zahlenkarten (`decks/phasenlauf/`
 - „↶ Zurück“ nimmt die eigenen Schritte zurück – bis zum nächsten Würfeln.
 - Brett-Reihenfolge: `BOARD` in `js/phasen.js`.
 
+## Wuff! (Lauf-Kartenspiel mit Figuren)
+
+6er-Brett mit 96 Feldern (16 pro Farbe), vermessen nach einem Foto des Originalbretts (`js/dog-board.js`),
+Logik in `js/dog.js`, Oberfläche in `js/dog-ui.js`, 110 Karten.
+
+- Karte wählen → Figuren, die damit ziehen können, leuchten → Figur anfassen und auf ein leuchtendes Feld ziehen
+  (oder Figur antippen, Feld antippen). Schlagen, Verbrennen (7) und Tauschen passieren automatisch.
+- Woanders hingezogen = freier Zug wie am echten Tisch (ohne Regelprüfung, ohne Karte). Danach die Karte über
+  „Frei verschieben / Karte ohne Zug ablegen“ abwerfen.
+- 4 oder 6 Spieler: Teams (gegenüber), Kartentausch mit dem Partner. 2, 3 oder 5: jeder für sich, 5 Figuren, Karte nach links.
+- Runden mit 6, 5, 4, 3, 2 Karten. Wer nicht ziehen kann, scheidet für die Runde aus.
+- „↶ Zurück“ nimmt den eigenen letzten Schritt zurück (bis der Nächste spielt).
+
 ## Neues Spiel (Deck) hinzufügen
 
 1. Ordner anlegen: `decks/<name>/` (z. B. `decks/phase10/`)

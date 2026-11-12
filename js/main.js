@@ -5,16 +5,18 @@ import { q, esc, store, modal, closeModal, listModal, confirmModal, toast, lobby
 import * as Cross from './cross.js';
 import * as Klecks from './klecks.js';
 import * as Phasen from './phasen.js';
+import * as Dog from './dog.js';
 import { initDiceUI, render as renderDice, onDiceEvent } from './dice-ui.js';
 import { initCrossUI, render as renderCross, onCrossEvent } from './cross-ui.js';
 import { initKlecksUI, render as renderKlecks, onKlecksEvent } from './klecks-ui.js';
 import { initPhasenUI, render as renderPhasen, onPhasenEvent } from './phasen-ui.js';
+import { initDogUI, render as renderDog, onDogEvent } from './dog-ui.js';
 
 const { rid } = Cards;
 const $app = document.getElementById('app');
 // Kartenspiele und Würfelspiele haben je eigene Spiellogik mit gleicher Schnittstelle.
-const ENGINES = { dice: Dice, cross: Cross, klecks: Klecks, phasen: Phasen };
-const NO_VARIANTS = new Set(['phasen']);
+const ENGINES = { dice: Dice, cross: Cross, klecks: Klecks, phasen: Phasen, dog: Dog };
+const NO_VARIANTS = new Set(['phasen', 'dog']);
 const engine = (deck) => ENGINES[deck.type] || Cards;
 const hasVariants = (deck) => !!ENGINES[deck.type] && !NO_VARIANTS.has(deck.type);
 
@@ -370,6 +372,7 @@ function renderGame() {
   if (d.type === 'cross') return renderCross();
   if (d.type === 'klecks') return renderKlecks();
   if (d.type === 'phasen') return renderPhasen();
+  if (d.type === 'dog') return renderDog();
   let g = q('#game');
   if (!g) {
     $app.innerHTML = skeleton();
@@ -629,6 +632,7 @@ function showEvent(ev) {
     onCrossEvent(ev);
     onKlecksEvent(ev);
     onPhasenEvent(ev);
+    onDogEvent(ev);
   } else if (ev.kind === 'undo') {
     toast(`↶ ${ev.name} hat zurückgenommen: ${ev.label}`);
   } else if (ev.kind === 'shout') {
@@ -844,6 +848,7 @@ initDiceUI({ ui, act, copyLink, leave, openRename });
 initCrossUI({ ui, act, copyLink, leave, openRename });
 initKlecksUI({ ui, act, copyLink, leave, openRename });
 initPhasenUI({ ui, act, copyLink, leave, openRename });
+initDogUI({ ui, act, copyLink, leave, openRename });
 
 // Nach Neuladen automatisch wieder in den Raum (gleicher Platz, gleiche Karten).
 const active = store.get('kt-active', 'session');

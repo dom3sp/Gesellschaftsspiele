@@ -1,0 +1,10 @@
+{
+  "type": "dog",
+  "name": "Wuff!",
+  "description": "Figuren mit Karten ins Ziel bringen – im Team oder jeder für sich. Mit Schlagen, Tauschen und der berüchtigten 7.",
+  "tagline": "Brett + 110 Karten",
+  "minPlayers": 2,
+  "maxPlayers": 6,
+  "aspect": 1,
+  "cover": "cover.svg"
+}
