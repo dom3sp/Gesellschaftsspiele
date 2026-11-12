@@ -73,6 +73,19 @@ Varianten unterscheiden sich nur im Blatt (`VARIANTS` in `js/klecks.js`: 7 Zeile
 - Ende nach dem Wurf, in dem jemand zwei Farben komplett hat. Allein: 2 + 2 Würfel, 30 Würfe.
 - „↶ Zurück“ nimmt den eigenen letzten Eintrag zurück.
 
+## Phasenlauf (Brettspiel mit Karten)
+
+Brett mit 32 Aktionsfeldern, Phasenring und 96 Zahlenkarten (`decks/phasenlauf/`, Logik in `js/phasen.js`, Oberfläche in `js/phasen-ui.js`).
+
+- Zug: würfeln → Würfel wählen (Pasch: einfach oder doppelt) → Stein läuft, besetzte Felder werden übersprungen → Aktion des Feldes →
+  Phase auslegen / anlegen (freiwillig) → eine Karte abwerfen.
+- 8 Aktionen: +1/+2/+3 Karten, Joker (nur die anderen sehen die Vorderseite), +1 & Extra-Zug, Ablage durchsuchen,
+  Tauschen (1–4 ab, eine mehr nehmen), Alle +1, Fragen (nach einer Zahl), Freie Wahl (Startfeld).
+- Die Website prüft Phasen und Anlegen (inkl. Joker-Regeln) und rückt die Phasenanzeiger am Durchgangsende vor (+2 / +1).
+  Wer die Phase nicht geschafft hat, wählt 5 Karten zum Behalten. Wer zuerst den Lorbeerkranz erreicht, gewinnt.
+- „↶ Zurück“ nimmt die eigenen Schritte zurück – bis zum nächsten Würfeln.
+- Brett-Reihenfolge: `BOARD` in `js/phasen.js`.
+
 ## Neues Spiel (Deck) hinzufügen
 
 1. Ordner anlegen: `decks/<name>/` (z. B. `decks/phase10/`)

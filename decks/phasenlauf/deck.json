@@ -1,0 +1,10 @@
+{
+  "type": "phasen",
+  "name": "Phasenlauf",
+  "description": "Brettspiel mit Karten: würfeln, Aktionsfelder nutzen und die 10 Phasen als Erster schaffen.",
+  "tagline": "Brett + 96 Karten",
+  "minPlayers": 2,
+  "maxPlayers": 6,
+  "aspect": 1,
+  "cover": "cover.svg"
+}
