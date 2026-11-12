@@ -154,7 +154,8 @@ function renderBoard() {
   const takeNow = canAct && v.step === 'action' && v.pending && v.pending.type === 'take';
   q('#pcenter').innerHTML =
     cardSvg(37.6, 42.2, 11, 15.6, v.drawCount ? 'back' : null, takeNow && v.drawCount ? 'takeDraw' : '', `<text x="43.1" y="60.6" text-anchor="middle" class="ctext small light">${v.drawCount}</text>`) +
-    cardSvg(51.4, 42.2, 11, 15.6, v.discardTop, takeNow && v.discardTop ? 'takeDiscard' : '', `<text x="56.9" y="60.6" text-anchor="middle" class="ctext small light">${v.discardCount}</text>`) +
+    `<g data-drop="discard" class="dropzone${canDiscard() ? ' can' : ''}"><rect x="50.4" y="41.2" width="13" height="17.6" rx="1.8" class="dropbox"/>` +
+    cardSvg(51.4, 42.2, 11, 15.6, v.discardTop, takeNow && v.discardTop ? 'takeDiscard' : '', `<text x="56.9" y="60.6" text-anchor="middle" class="ctext small light">${v.discardCount}</text>`) + '</g>' +
     (takeNow ? '<circle cx="50" cy="50" r="15.6" class="pulse-ring"/>' : '');
   // aktives Feld hervorheben
   wrap.querySelectorAll('.bfield.hl').forEach((e) => e.classList.remove('hl'));
@@ -375,7 +376,8 @@ function renderPanel() {
         ${!me.laid ? '<button class="btn primary" data-act="layStart">Phase auslegen …</button>' : ''}
         <button class="btn ${me.laid ? 'primary' : ''}" data-act="discard"${sel.size === 1 ? '' : ' disabled'}>${sel.size === 1 ? 'Ausgewählte Karte abwerfen' : 'Zum Abwerfen 1 Karte wählen'}</button>
       </div>
-      ${me.laid ? '<p class="tray-hint small">Anlegen: Karte unten antippen, dann auf eine Auslage tippen.</p>' : ''}`;
+      <p class="tray-hint small">Oder einfach eine Karte aus der Hand auf den Ablagestapel in der Brettmitte ziehen${me.laid ? ' – bzw. auf eine Auslage, um sie anzulegen' : ''}.</p>
+      ${me.laid ? '<p class="tray-hint small">Anlegen per Tippen: Karte unten antippen, dann auf eine Auslage tippen.</p>' : ''}`;
     }
   }
   el.innerHTML = head + proxy + body + myPhase;
@@ -530,7 +532,9 @@ function showFields() {
 }
 
 function bind(g) {
+  g.addEventListener('pointerdown', onDown);
   g.addEventListener('click', (e) => {
+    if (drag.justDropped) return;
     const t = e.target;
     const a = t.closest('[data-act]');
     if (a) { if (!a.disabled) onAct(a.dataset.act); return; }
@@ -565,3 +569,74 @@ function bind(g) {
     }
   });
 }
+
+// ---------- Karten ziehen (auf den Ablagestapel oder an eine Auslage) ----------
+const drag = { el: null, id: null, x0: 0, y0: 0, pid: null, on: false, ghost: null, hot: null, justDropped: false };
+function canDiscard() {
+  const { v, canAct } = info();
+  return canAct && v.step === 'play' && !lay;
+}
+function dropAt(x, y) {
+  const el = document.elementFromPoint(x, y);
+  if (!el) return null;
+  return el.closest('[data-drop="discard"]') || el.closest('[data-meld]');
+}
+function onDown(e) {
+  if (e.button !== undefined && e.button !== 0) return;
+  const el = e.target.closest('#phand [data-card]');
+  if (!el || !canDiscard()) return;
+  Object.assign(drag, { el, id: el.dataset.card, x0: e.clientX, y0: e.clientY, pid: e.pointerId, on: false, hot: null });
+}
+function onMove(e) {
+  if (!drag.el || e.pointerId !== drag.pid) return;
+  if (!drag.on) {
+    if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 8) return;
+    const r = drag.el.getBoundingClientRect();
+    const gh = drag.el.cloneNode(true);
+    gh.classList.add('pghost');
+    gh.classList.remove('sel');
+    gh.style.width = `${r.width}px`;
+    gh.style.height = `${r.height}px`;
+    document.body.appendChild(gh);
+    Object.assign(drag, { on: true, ghost: gh, w: r.width, h: r.height });
+    drag.el.classList.add('dragging');
+    document.body.classList.add('is-dragging', 'pdragging');
+    // passende Auslagen anzeigen
+    const c = handCard(drag.id);
+    const { v, turnP } = info();
+    const actor = v.players.find((p) => p.id === turnP?.id);
+    document.querySelectorAll('#pmelds [data-meld]').forEach((m) => {
+      const meld = v.melds.find((x) => x.id === m.dataset.meld);
+      m.classList.toggle('fits', !!(actor && actor.laid && meld && c && !fitCard(meld, c).error));
+    });
+  }
+  e.preventDefault();
+  drag.ghost.style.transform = `translate(${e.clientX - drag.w / 2}px, ${e.clientY - drag.h / 2}px) rotate(5deg)`;
+  const t = dropAt(e.clientX, e.clientY);
+  if (t !== drag.hot) {
+    drag.hot?.classList.remove('drop-hot');
+    t?.classList.add('drop-hot');
+    drag.hot = t;
+  }
+}
+function endDrag(e, cancelled) {
+  if (!drag.el || e.pointerId !== drag.pid) return;
+  const d = { ...drag };
+  Object.assign(drag, { el: null, on: false, ghost: null, hot: null });
+  if (!d.on) return;
+  d.ghost.remove();
+  d.el.classList.remove('dragging');
+  d.hot?.classList.remove('drop-hot');
+  document.body.classList.remove('is-dragging', 'pdragging');
+  drag.justDropped = true;
+  setTimeout(() => { drag.justDropped = false; }, 60);
+  if (cancelled) { render(); return; }
+  const t = dropAt(e.clientX, e.clientY);
+  if (!t) { render(); return; }
+  sel.delete(d.id);
+  if (t.dataset.drop === 'discard') C.act({ type: 'discard', cid: d.id });
+  else C.act({ type: 'append', cid: d.id, meld: t.dataset.meld });
+}
+window.addEventListener('pointermove', onMove, { passive: false });
+window.addEventListener('pointerup', (e) => endDrag(e, false));
+window.addEventListener('pointercancel', (e) => endDrag(e, true));
