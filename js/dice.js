@@ -77,7 +77,7 @@ export const VARIANTS = {
     ],
   },
   sieben: {
-    id: 'sieben', name: '7', short: '6 Würfel (einer 0–9) · 3 Tokens · 22 Felder',
+    id: 'sieben', name: 'Extreme', short: '6 Würfel (einer 0–9) · 3 Tokens · 22 Felder',
     dice: [6, 6, 6, 6, 6, 10], tokens: 3, bonusAt: 73, bonus: 45,
     lower: ['dreier', 'vierer', 'zweiPaare', 'dreiPaare', 'zweiDreier', 'fullHouse', 'grFullHouse', 'klStrasse', 'grStrasse', 'highway', 'fuenf', 'sechs', 'max10', 'min33', 'chance', 'superChance'],
     rules: [

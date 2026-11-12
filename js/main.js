@@ -158,7 +158,7 @@ function showVariantStep(deck) {
       <div class="variants">
         ${Object.values(V).map((v) => `
           <button class="variant-tile" data-variant="${v.id}">
-            <span class="variant-logo v-${v.id}">${v.id === 'classic' ? 'Classic' : `<small>${esc(deck.name)}</small>7`}</span>
+            <span class="variant-logo v-${v.id}">${esc(v.name)}</span>
             <span>${esc(v.short)}</span>
           </button>`).join('')}
       </div>

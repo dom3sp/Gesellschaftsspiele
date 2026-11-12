@@ -324,13 +324,9 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
   text-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
 }
 .variant-logo.v-sieben {
-  display: inline-flex; align-items: baseline; gap: 8px;
   font-family: "Arial Black", "Segoe UI Black", Impact, system-ui, sans-serif; font-weight: 900;
-  font-size: 3rem; color: #ff6b6b; text-shadow: 0 3px 0 #8f1515;
-}
-.variant-logo.v-sieben small {
-  font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
-  color: var(--paper); text-shadow: none;
+  font-size: 2.3rem; font-style: italic; text-transform: uppercase; letter-spacing: 0.04em;
+  color: #ff6b6b; text-shadow: 0 3px 0 #8f1515;
 }
 
 .dice-game .dg-body {

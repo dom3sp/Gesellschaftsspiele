@@ -191,7 +191,7 @@ function renderSheet() {
   const upperDone = (p) => cats.filter((c) => c.upper).every((c) => typeof v.sheets[p.id]?.[c.id] === 'number');
 
   q('#sheet').innerHTML = `
-    <thead><tr><th class="cat corner">Spiel ${v.game}<small>${esc(V.name === '7' ? 'Variante 7' : V.name)}</small></th>${ps.map((p) => `
+    <thead><tr><th class="cat corner">Spiel ${v.game}<small>${esc(V.name)}</small></th>${ps.map((p) => `
       <th class="${colCls(p)} phead${p.connected ? '' : ' off'}" style="--pc:${p.color}"><span class="dot"></span><b>${esc(p.name)}</b>
         <small>🏆 ${p.wins}${V.tokens ? ` · 🪙 ${p.tokens}` : ''}</small></th>`).join('')}</tr></thead>
     <tbody>
